@@ -30,3 +30,5 @@ export function buildCommitPrompt(
     "Si hay múltiples cambios, usa un título corto y cuerpo con viñetas.",
   ]
     .filter(Boolean)
+    .join("\n");
+}

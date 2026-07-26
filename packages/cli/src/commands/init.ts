@@ -1,4 +1,4 @@
-import { intro, outro, select, text, isCancel, cancel } from "@clack/prompts";
+ import { intro, outro, select, text, isCancel, cancel } from "@clack/prompts";
 import pc from "picocolors";
 import { getProjectConfig, saveProjectConfig } from "@aigit/core";
 import type { AigitConfig } from "@aigit/core";
