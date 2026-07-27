@@ -1,0 +1,60 @@
+{
+  "name": "aigit-vscode",
+  "displayName": "AI Git",
+  "description": "AI-powered git commit generator and documentation tool",
+  "version": "0.1.0",
+  "publisher": "aigit",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aigit.commit",
+        "title": "AI Git: Generate Commit"
+      },
+      {
+        "command": "aigit.doc",
+        "title": "AI Git: Generate Documentation"
+      },
+      {
+        "command": "aigit.init",
+        "title": "AI Git: Initialize Configuration"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "aigit.commit",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "package": "vsce package",
+    "lint": "biome check src/"
+  },
+  "dependencies": {
+    "@aigit/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.92.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "@vscode/test-electron": "^2.4.0",
+    "vsce": "^2.15.0"
+  }
+}
