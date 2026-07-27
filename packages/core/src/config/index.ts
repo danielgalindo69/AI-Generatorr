@@ -23,13 +23,37 @@ export function getDefaultConfig(): AigitConfig {
   };
 }
 
-export function getProjectConfig(projectDir: string): AigitConfig {
-  const configPath = path.join(projectDir, CONFIG_FILENAME);
-  if (!fs.existsSync(configPath)) {
-    return getDefaultConfig();
+function loadDotenv(dir: string): void {
+  const envPath = path.join(dir, ".env");
+  if (fs.existsSync(envPath)) {
+    const content = fs.readFileSync(envPath, "utf-8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eqIdx = trimmed.indexOf("=");
+      if (eqIdx === -1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      const value = trimmed.slice(eqIdx + 1).trim();
+      if (key && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
   }
-  const raw = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  return ConfigSchema.parse(raw);
+}
+
+export function getProjectConfig(projectDir: string): AigitConfig {
+  loadDotenv(projectDir);
+
+  const configPath = path.join(projectDir, CONFIG_FILENAME);
+  let config: AigitConfig;
+  if (fs.existsSync(configPath)) {
+    const raw = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    config = ConfigSchema.parse(raw);
+  } else {
+    config = getDefaultConfig();
+  }
+
+  return resolveEnvApiKey(config);
 }
 
 export function saveProjectConfig(projectDir: string, config: AigitConfig): void {
@@ -48,14 +72,33 @@ export function getGlobalConfigDir(): string {
 
 export function getGlobalConfig(): AigitConfig {
   const configPath = path.join(getGlobalConfigDir(), "config.json");
-  if (!fs.existsSync(configPath)) {
-    return getDefaultConfig();
+  let config: AigitConfig;
+  if (fs.existsSync(configPath)) {
+    const raw = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    config = ConfigSchema.parse(raw);
+  } else {
+    config = getDefaultConfig();
   }
-  const raw = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  return ConfigSchema.parse(raw);
+
+  return resolveEnvApiKey(config);
 }
 
 export function saveGlobalConfig(config: AigitConfig): void {
   const configPath = path.join(getGlobalConfigDir(), "config.json");
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
+function resolveEnvApiKey(config: AigitConfig): AigitConfig {
+  const envVarName =
+    config.aiProvider === "gemini"
+      ? "GEMINI_API_KEY"
+      : config.aiProvider === "groq"
+        ? "GROQ_API_KEY"
+        : null;
+
+  if (envVarName && process.env[envVarName]) {
+    return { ...config, apiKey: process.env[envVarName] };
+  }
+
+  return config;
 }

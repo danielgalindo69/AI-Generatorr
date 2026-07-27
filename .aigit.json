@@ -1,0 +1,6 @@
+{
+  "aiProvider": "gemini",
+  "apiKey": "AIza...",
+  "language": "es",
+  "commitStyle": "conventional"
+}

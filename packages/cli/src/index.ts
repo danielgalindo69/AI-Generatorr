@@ -2,6 +2,7 @@
 import { Command } from "commander";
 import { initCommand } from "./commands/init.js";
 import { commitCommand } from "./commands/commit.js";
+import { docCommand } from "./commands/doc.js";
 import { hookCommand } from "./commands/hook.js";
 import { configCommand } from "./commands/config.js";
 
@@ -24,6 +25,11 @@ program
   .option("-m, --message <hint>", "Provide additional context for the AI")
   .option("--hook", "Run in hook mode (non-interactive)")
   .action(commitCommand);
+
+program
+  .command("doc")
+  .description("Generate or update README.md with AI")
+  .action(docCommand);
 
 program
   .command("hook")
